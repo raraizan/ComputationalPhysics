@@ -14,15 +14,7 @@ void setup() {
 void draw() {
   background(0);
 
-  float h = 1 / iterations;
-  
-  for (int i = 0; i < iterations; i++) {
-
-    nextState = rungeKutta4(time, p, h);
-    p.updateState(nextState);
-
-    time += h;
-  }
+  // Implement whatever you want here
   
   // Get variables
   float x = p.getCartesian()[1];

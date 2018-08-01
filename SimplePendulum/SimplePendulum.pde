@@ -15,38 +15,12 @@ void draw() {
   // Do some logic (implement numerical methods)
 
   // Euler method
-  float h = 1 / iterations;
-  
-  for (int i = 0; i < iterations; i++) {
-
-    nextState = rungeKutta4(time, p, h);
-    p.updateState(nextState);
-
-    time += h;
-  }
 
   // Get variables
   float x = p.getCartesian()[1];
   float y = p.getCartesian()[0];
-  // Draw stuff
+  // Draw stuff in here
 
-  pushMatrix();
-  translate(width / 2, height / 2);
-  noFill();
-  stroke(0);
-  ellipse(0, 0, 10, 10);
-  line(0, 0, x, y);
-  line(0, 0, x, y);
-  noStroke();
-  fill(0);
-  ellipse(x, y, 10, 10);
-  popMatrix();
-
-  stroke(0);
-  text("  E: " + p.energy(), 10, height - 55);
-  text("E0: " + p.initial_energy, 10, height - 40);
-  text("E%: " + 100 * p.energy() / p.initial_energy, 10, height - 25);
-  text("e%: " + 100 * (p.energy() - p.initial_energy) / p.initial_energy, 10, height - 10);
 }
 
 void mousePressed() {
