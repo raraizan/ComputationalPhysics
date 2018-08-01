@@ -4,6 +4,8 @@ float[] currentState = new float[4];
 float[] nextState = new float[4];
 float time;
 
+float iterations = 10000;
+
 void setup() {
   size(500, 500, P2D);
   dp = new DoublePendulum();
@@ -14,16 +16,15 @@ void draw() {
   // Do some logic (implement numerical methods)
 
   // Euler method
-  float h = 0.0001;
-  for (int i = 0; i < 10000; i++) {
+  float h = 1 / iterations;
+  for (int i = 0; i < iterations; i++) {
     currentState = dp.getState();
 
-    nextState = sum(mult(dp.equation(time, currentState), h), currentState) ;
+    nextState = euler(time, dp, h) ;
     dp.updateState(nextState);
 
     time += h;
   }
-
 
   //// For double pendulum.
   // Get variables
@@ -58,7 +59,27 @@ void draw() {
 }
 
 void mousePressed() {
-  dp = new DoublePendulum(random(PI), 100);
+  dp = new DoublePendulum(random(-PI, PI), random(-PI, PI));
+}
+
+float[] euler(float time, DoublePendulum p, float h) {
+  float[] state =  sum(mult(p.equation(time, p.getState()), h), p.getState());
+  return state;
+}
+
+float[] rungeKutta4(float time, DoublePendulum p, float h) {
+  float[] h1 = mult(p.equation(time, p.getState()), h);
+  float[] h2 = mult(p.equation(time + 0.5 * h, sum(p.getState(), mult(h1, 0.5))), h);
+  float[] h3 = mult(p.equation(time + 0.5 * h, sum(p.getState(), mult(h2, 0.5))), h);
+  float[] h4 = mult(p.equation(time + h, sum(p.getState(), h3)), h);
+
+  float[] state = h1;
+  state = sum(state, h2);
+  state = sum(state, h3);
+  state = sum(state, h4);
+  state = mult(state, 0.1666);
+  state = sum(state, p.getState());
+  return state;
 }
 
 float[] sum(float[] x, float[] y) {

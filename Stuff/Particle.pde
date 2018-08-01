@@ -1,24 +1,47 @@
 class Particle {
-  PVector pos;
-  PVector vel;
-  PVector force;
+  float x;
+  float y;
+  float u;
+  float v;
+  float fx;
+  float fy;
   float mass;
 
   Particle(float x_, float y_, float u_, float v_) {
-    this.pos = new PVector(x_, y_);
-    this.vel = new PVector(u_, v_);
+    this.x = x_;
+    this.y = y_;
+    this.u = u_;
+    this.v = v_;
+    this.fx = 0;
+    this.fy = 0;
     this.mass = 1;
-    this.force = new PVector(0, 0);
   }
 
-  void applyForce(PVector force_) {
-    this.force.add(force_);
+  void applyForce(float fx_, float fy_) {
+    this.fx += fx_;
+    this.fy += fy_;
   }
 
-  void update(float h) {
-    this.pos.add(PVector.mult(this.vel, h));
-    this.vel.add(PVector.mult(this.force, h / this.mass));
-    this.force = new PVector(0, 0);
+  float[] equation(float t, float[] state_) {
+    float[] state = {state_[2], state_[3], fx, fy};
+    return state;
   }
 
+  void updateState(float[] state) {
+    this.x = state[0];
+    this.y = state[1];
+    this.u = state[2];
+    this.v = state[3];
+  }
+
+
+  float[] getState() {
+    float[] state = {this.x, this.y, this.u, this.v};
+    return state;
+  }
+
+  float [] getCartesian() {
+    float[] coordinates = {this.x, this.y};
+    return coordinates;
+  }
 }
