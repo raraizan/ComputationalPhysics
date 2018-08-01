@@ -3,17 +3,18 @@ class Pendulum {
   float r;
   float theta;
   float dtheta;
+  float mass;
 
   float initial_theta;
   float initial_energy;
-  float mass;
 
   float gravity = 1;
 
   Pendulum(float initial_theta_, float r_) {
+    this.r = r_;
     this.theta = initial_theta_;
     this.dtheta = 0;
-    this.r = r_;
+    this.mass = 1;
 
     this.initial_theta = initial_theta_;
     this.initial_energy = this.energy();
@@ -31,20 +32,29 @@ class Pendulum {
     float theta = state_[0];
     float dtheta = state_[1];
     float w2 = this.gravity / this.r;
-    
+
     state[0] = dtheta;
-    state[1] = w2 * sin(theta);
+    state[1] = -w2 * sin(theta);
 
     return state;
   }
 
-  void update(float[] state) {
+  void updateState(float[] state) {
     this.theta = state[0];
     this.dtheta = state[1];
   }
 
+
+  float[] getState() {
+    float[] state = new float[2];
+    state[0] = this.theta;
+    state[1] = this.dtheta;
+
+    return state;
+  }
+
   float [] getCartesian() {
-    float[] coordinates = new float[4];
+    float[] coordinates = new float[2];
     coordinates[0] = this.r * cos(this.theta);
     coordinates[1] = this.r * sin(this.theta);
     return coordinates;
