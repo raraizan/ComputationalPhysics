@@ -29,8 +29,12 @@ class Pendulum {
   float[] equation(float t, float[] state_) {
 
     float[] state = new float[2];
+    float w2 = - this.gravity / this.r;
+    
+    state[0] = state_[1];
+    state[1] = w2 * sin(state_[0]);
 
-    return state_;
+    return state;
   }
 
   void updateState(float[] state) {
