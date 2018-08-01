@@ -3,16 +3,30 @@ DoublePendulum dp;
 float[] currentState = new float[4];
 float[] nextState = new float[4];
 float time;
+float xp = 0;
+float yp = 0;
+float iterations = 100;
+int frames = 0;
 
-float iterations = 10000;
+float x1 = 0;
+float y1 = 0;
+float x2 = 0;
+float y2 = 0;
+
+PGraphics canvas;
 
 void setup() {
   size(500, 500, P2D);
   dp = new DoublePendulum();
+  canvas = createGraphics(width, height);
+
+  canvas.beginDraw();
+  canvas.background(255);
+  canvas.endDraw();
 }
 
 void draw() {
-  background(255);
+  background(canvas);
   // Do some logic (implement numerical methods)
 
   // Euler method
@@ -21,6 +35,8 @@ void draw() {
     currentState = dp.getState();
 
     nextState = euler(time, dp, h) ;
+
+
     dp.updateState(nextState);
 
     time += h;
@@ -28,10 +44,13 @@ void draw() {
 
   //// For double pendulum.
   // Get variables
-  float x1 = dp.getCartesian()[0];
-  float y1 = dp.getCartesian()[1];
-  float x2 = dp.getCartesian()[2];
-  float y2 = dp.getCartesian()[3];
+
+  xp = x2;
+  yp = y2; 
+  x1 = dp.getCartesian()[0];
+  y1 = dp.getCartesian()[1];
+  x2 = dp.getCartesian()[2];
+  y2 = dp.getCartesian()[3];
 
   // Draw stuff
   pushMatrix();
@@ -51,15 +70,30 @@ void draw() {
   ellipse(x2, y2, 10, 10);
   popMatrix();
 
+  canvas.beginDraw();
+  canvas.translate(width / 2, height / 2);
+  canvas.rotate(HALF_PI);
+
+  canvas.stroke(0);
+  if (frames > 1) canvas.line(xp, yp, x2, y2);
+  canvas.endDraw();
+
+
   stroke(0);
   text("  E: " + dp.energy(), 10, height - 55);
   text("E0: " + dp.initial_energy, 10, height - 40);
   text("E%: " + 100 * dp.energy() / dp.initial_energy, 10, height - 25);
   text("e%: " + 100 * (dp.energy() - dp.initial_energy) / dp.initial_energy, 10, height - 10);
+
+  frames++;
 }
 
 void mousePressed() {
   dp = new DoublePendulum(random(-PI, PI), random(-PI, PI));
+  canvas.beginDraw();
+  canvas.background(255);
+  canvas.endDraw();
+  frames = 0;
 }
 
 float[] euler(float time, DoublePendulum p, float h) {
