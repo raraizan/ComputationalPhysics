@@ -24,6 +24,8 @@ class Particle {
 
   float[] equation(float t, float[] state_) {
     float[] state = {state_[2], state_[3], fx, fy};
+    fx = 0;
+    fy = 0;
     return state;
   }
 
