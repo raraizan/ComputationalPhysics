@@ -1,4 +1,7 @@
-Particle[] particles = new Particle[5];
+import peasy.*;
+PeasyCam cam;
+
+Particle[] particles = new Particle[10];
 float[] currentState = new float[4];
 float[] nextState = new float[4];
 float time = 0;
@@ -6,25 +9,35 @@ float time = 0;
 float iterations = 1000;
 
 void setup() {
-  size(500, 500, P2D);
-
+  size(500, 500, P3D);
+  cam = new PeasyCam(this, 500);
   for (int i = 0; i < particles.length; i++) {
-    particles[i] = new Particle(random(width), random(height), random(-1, 1), random(-1, 1));
+    particles[i] = new Particle(random(width / 2), random(height / 2), random(-1, 1), random(-1, 1));
   }
 }
 
 void draw() {
   background(0);
 
+  PVector cm = new PVector(0, 0);
+  float totalMass = 0;
 
   for (Particle p : particles) {
+    cm.add(new PVector(p.x, p.y));
+    totalMass += p.mass;
+  }
+
+  for (Particle p : particles) {
+
     float h = 1 / iterations; 
 
     for (int i = 0; i < iterations; i++) {
+
       for (Particle q : particles) {
         if (p != q) p.applyForce(attraction(p, q)[0], attraction(p, q)[1]);
       }
-      nextState = rungeKutta4(time, p, h); 
+
+      nextState = euler(time, p, h); 
       p.updateState(nextState); 
 
       time += h;
@@ -34,9 +47,11 @@ void draw() {
     float x = p.getCartesian()[1]; 
     float y = p.getCartesian()[0]; 
     // Draw stuff
-
-    pushMatrix(); 
-    ellipse(x, y, 10, 10); 
+    pushMatrix();
+    translate(x, y, 0);
+    fill(255);
+    lights();
+    sphere(10); 
     popMatrix();
   }
 }
@@ -68,7 +83,7 @@ float[] rungeKutta4(float time, Particle p, float h) {
 }
 
 float[] attraction(Particle p, Particle q) {
-  
+
   float rad = dist(p.x, p.y, q.x, q.y);
   float[] force = {q.x - p.x, q.y - p.y};
   force = mult(force, 10 / (rad * rad));

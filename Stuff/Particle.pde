@@ -23,7 +23,7 @@ class Particle {
   }
 
   float[] equation(float t, float[] state_) {
-    float[] state = {state_[2], state_[3], fx, fy};
+    float[] state = {state_[2], state_[3], fx / mass, fy / mass};
     fx = 0;
     fy = 0;
     return state;
@@ -34,6 +34,10 @@ class Particle {
     this.y = state[1];
     this.u = state[2];
     this.v = state[3];
+
+
+    if (x < 0 || x > width) u *= -1;
+    if (y < 0 || x > height) v *= -1;
   }
 
 
