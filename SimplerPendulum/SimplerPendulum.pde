@@ -1,99 +1,139 @@
 DoublePendulum dp;
+DoublePendulum dq;
 
-float[] currentState = new float[4];
-float[] nextState = new float[4];
+float[] pcurrentState = new float[4];
+float[] pnextState = new float[4];
+float[] qcurrentState = new float[4];
+float[] qnextState = new float[4];
+
+float x1p = 0;
+float y1p = 0;
+float x2p = 0;
+float y2p = 0;
+
+float x1q = 0;
+float y1q = 0;
+float x2q = 0;
+float y2q = 0;
+
+float x2pp = 0;
+float y2pp = 0;
+float x2qp = 0;
+float y2qp = 0;
 float time;
-float xp = 0;
-float yp = 0;
-float iterations = 100;
-int frames = 0;
 
-float x1 = 0;
-float y1 = 0;
-float x2 = 0;
-float y2 = 0;
+float iterations = 1024;
 
 PGraphics canvas;
-
+int frames = 0;
 void setup() {
-  size(500, 500, P2D);
-  dp = new DoublePendulum();
+  fullScreen(P2D);
   canvas = createGraphics(width, height);
 
   canvas.beginDraw();
-  canvas.background(255);
+  canvas.colorMode(HSB);
+  canvas.background(0, 255);
   canvas.endDraw();
+
+  float ang1 = random(-PI, PI);
+  float ang2 = random(-PI, PI);
+
+  dp = new DoublePendulum(ang1, ang2, 250, 250);
+  dq = new DoublePendulum(ang1, ang2 + 0.01 * random(1), 300, 300);
 }
 
 void draw() {
-  background(canvas);
+  image(canvas, 0, 0);
   // Do some logic (implement numerical methods)
 
   // Euler method
   float h = 1 / iterations;
   for (int i = 0; i < iterations; i++) {
-    currentState = dp.getState();
 
-    nextState = euler(time, dp, h) ;
-
-
-    dp.updateState(nextState);
-
+    dp.updateState(rungeKutta4(time, dp, h));
+    dq.updateState(rungeKutta4(time, dq, h));
     time += h;
   }
 
   //// For double pendulum.
   // Get variables
 
-  xp = x2;
-  yp = y2; 
-  x1 = dp.getCartesian()[0];
-  y1 = dp.getCartesian()[1];
-  x2 = dp.getCartesian()[2];
-  y2 = dp.getCartesian()[3];
+  x1p = dp.getCartesian()[0];
+  y1p = dp.getCartesian()[1];
+  x2pp = x2p;
+  y2pp = y2p;
+  x2p = dp.getCartesian()[2];
+  y2p = dp.getCartesian()[3];
 
+  x1q = dq.getCartesian()[0];
+  y1q = dq.getCartesian()[1];
+  x2qp = x2q;
+  y2qp = y2q;
+  x2q = dq.getCartesian()[2];
+  y2q = dq.getCartesian()[3];
   // Draw stuff
-  pushMatrix();
-  translate(width / 2, height / 2);
 
-  rotate(HALF_PI);
+//  pushMatrix();
+//  translate(width / 2, height / 2);
 
-  noFill();
-  stroke(0);
-  ellipse(0, 0, 10, 10);
-  line(0, 0, x1, y1);
-  line(x1, y1, x2, y2);
+//  rotate(HALF_PI);
 
-  noStroke();
-  fill(0);
-  ellipse(x1, y1, 10, 10);
-  ellipse(x2, y2, 10, 10);
-  popMatrix();
+//  noFill();
+//  stroke(0);
+//  ellipse(0, 0, 10, 10);
+
+//  line(0, 0, x1p, y1p);
+//  line(x1p, y1p, x2p, y2p);
+//  line(0, 0, x1q, y1q);
+//  line(x1q, y1q, x2q, y2q);
+
+//  noStroke();
+//  fill(0, 255, 0);
+//  ellipse(x1p, y1p, 10, 10);
+//  ellipse(x2p, y2p, 10, 10);
+
+//  fill(0, 0, 255);
+
+//  ellipse(x1q, y1q, 10, 10);
+//  ellipse(x2q, y2q, 10, 10);
+//  popMatrix();
 
   canvas.beginDraw();
+  canvas.background(0, 5);
   canvas.translate(width / 2, height / 2);
   canvas.rotate(HALF_PI);
-
-  canvas.stroke(0);
-  if (frames > 1) canvas.line(xp, yp, x2, y2);
+  if (frames > 1) {
+    canvas.stroke(frames % 256, 255, 255);
+    canvas.strokeWeight(2);
+    canvas.line(x2p, y2p, x2q, y2q);
+    canvas.stroke(0, 0, 255);
+    //canvas.line(x2q, y2q, x2qp, y2qp);
+  }
   canvas.endDraw();
 
+//  stroke(0);
+//  text("  E: " + dp.energy(), 10, height - 55);
+//  text("E0: " + dp.initial_energy, 10, height - 40);
+//  text("E%: " + 100 * dp.energy() / dp.initial_energy, 10, height - 25);
+//  text("e%: " + 100 * (dp.energy() - dp.initial_energy) / dp.initial_energy, 10, height - 10);
 
-  stroke(0);
-  text("  E: " + dp.energy(), 10, height - 55);
-  text("E0: " + dp.initial_energy, 10, height - 40);
-  text("E%: " + 100 * dp.energy() / dp.initial_energy, 10, height - 25);
-  text("e%: " + 100 * (dp.energy() - dp.initial_energy) / dp.initial_energy, 10, height - 10);
-
+//  text("  E: " + dq.energy(), 120, height - 55);
+//  text("E0: " + dq.initial_energy, 120, height - 40);
+//  text("E%: " + 100 * dq.energy() / dq.initial_energy, 120, height - 25);
+//  text("e%: " + 100 * (dq.energy() - dq.initial_energy) / dq.initial_energy, 120, height - 10);
   frames++;
 }
 
 void mousePressed() {
-  dp = new DoublePendulum(random(-PI, PI), random(-PI, PI));
+  float ang1 = random(-PI, PI);
+  float ang2 = random(-PI, PI);
+
   canvas.beginDraw();
-  canvas.background(255);
+  canvas.background(0, 255);
   canvas.endDraw();
   frames = 0;
+  dp = new DoublePendulum(ang1, ang2, 250, 250);
+  dq = new DoublePendulum(ang1, ang2 + 0.01 * random(1), 300, 300);
 }
 
 float[] euler(float time, DoublePendulum p, float h) {

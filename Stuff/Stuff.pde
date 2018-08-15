@@ -1,32 +1,21 @@
-import peasy.*;
-PeasyCam cam;
 
-Particle[] particles = new Particle[10];
+Particle[] particles = new Particle[50];
 float[] currentState = new float[4];
 float[] nextState = new float[4];
 float time = 0;
 
-float iterations = 1000;
+float iterations = 512;
 
 void setup() {
-  size(500, 500, P3D);
-  cam = new PeasyCam(this, 500);
+  //size(500, 500, P2D);
+  fullScreen(P2D);
   for (int i = 0; i < particles.length; i++) {
-    particles[i] = new Particle(random(width / 2), random(height / 2), random(-1, 1), random(-1, 1));
+    particles[i] = new Particle(random(width), random(height), 0, 0);
   }
 }
 
 void draw() {
   background(0);
-
-  PVector cm = new PVector(0, 0);
-  float totalMass = 0;
-
-  for (Particle p : particles) {
-    cm.add(new PVector(p.x, p.y));
-    totalMass += p.mass;
-  }
-
   for (Particle p : particles) {
 
     float h = 1 / iterations; 
@@ -44,21 +33,34 @@ void draw() {
     }
 
     // Get variables
-    float x = p.getCartesian()[1]; 
-    float y = p.getCartesian()[0]; 
+    float x = p.getCartesian()[0]; 
+    float y = p.getCartesian()[1]; 
     // Draw stuff
-    pushMatrix();
-    translate(x, y, 0);
     fill(255);
-    lights();
-    sphere(10); 
-    popMatrix();
+
+    ellipse(x, y, 10, 10);
   }
+
+  PVector cm = new PVector(0, 0);
+  float totalMass = 0;
+
+  stroke(255);
+  for (Particle pico : particles) {
+    cm.add(new PVector(pico.x, pico.y));
+    totalMass += pico.mass;
+    //line(0,0,pico.x, pico.y);
+  }
+
+  cm.div(totalMass);
+  fill(0, 255, 0);
+  translate(cm.x, cm.y);
+
+  ellipse(-cm.x + width / 2, -cm.y + height / 2, 30, 30);
 }
 
 void mousePressed() {
   for (int i = 0; i < particles.length; i++) {
-    particles[i] = new Particle(random(width), random(height), random(-1, 1), random(-1, 1));
+    particles[i] = new Particle(random(width), random(height), 0, 0);
   }
 }
 

@@ -34,10 +34,6 @@ class Particle {
     this.y = state[1];
     this.u = state[2];
     this.v = state[3];
-
-
-    if (x < 0 || x > width) u *= -1;
-    if (y < 0 || x > height) v *= -1;
   }
 
 
