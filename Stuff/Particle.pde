@@ -23,7 +23,13 @@ class Particle {
   }
 
   float[] equation(float t, float[] state_) {
+<<<<<<< HEAD
     float[] state = {state_[2], state_[3], fx  / mass, fy / mass};
+=======
+    float[] state = {state_[2], state_[3], fx / mass, fy / mass};
+    fx = 0;
+    fy = 0;
+>>>>>>> Finished
     return state;
   }
 
